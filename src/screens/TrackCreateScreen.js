@@ -1,10 +1,39 @@
-import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+/** @format */
 
-const TrackCreateScreen = () => {
-  return <Text style={{ fontSize: 48 }}>TrackCreateScreen</Text>;
+import '../_mockLocation';
+import React, { useContext, useCallback } from 'react';
+import { StyleSheet } from 'react-native';
+import { Text } from 'react-native-elements';
+import { SafeAreaView, withNavigationFocus } from 'react-navigation';
+import Map from '../components/Map';
+import { Context as LocationContext } from '../context/LocationContext';
+import ignoreWarnings from 'react-native-ignore-warnings';
+import useLocation from '../hooks/useLocation';
+import TrackForm from '../components/TrackForm';
+
+ignoreWarnings([
+  'Your project is accessing the following APIs',
+  'YellowBox has been replaced',
+]);
+
+const TrackCreateScreen = ({ isFocused }) => {
+  const { state, addLocation } = useContext(LocationContext);
+  
+  const callBack = useCallback( (location) => {
+    addLocation(location, state.recording)
+  }, [state.recording]);
+
+  const [err] = useLocation(isFocused, callBack)
+  return (
+    <SafeAreaView forceInset={{ top: 'always' }}>
+      <Text h2> Create a Track</Text>
+      <Map />
+      {err ? <Text>Please enable location services</Text> : null}
+      <TrackForm />
+    </SafeAreaView>
+  );
 };
 
 const styles = StyleSheet.create({});
 
-export default TrackCreateScreen;
+export default withNavigationFocus(TrackCreateScreen);
