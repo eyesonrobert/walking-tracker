@@ -10,6 +10,7 @@ import { Context as LocationContext } from '../context/LocationContext';
 import ignoreWarnings from 'react-native-ignore-warnings';
 import useLocation from '../hooks/useLocation';
 import TrackForm from '../components/TrackForm';
+import { FontAwesome } from '@expo/vector-icons';
 
 ignoreWarnings([
   'Your project is accessing the following APIs',
@@ -17,13 +18,19 @@ ignoreWarnings([
 ]);
 
 const TrackCreateScreen = ({ isFocused }) => {
-  const { state, addLocation } = useContext(LocationContext);
-  
-  const callBack = useCallback( (location) => {
-    addLocation(location, state.recording)
-  }, [state.recording]);
+  const {
+    state: { recording },
+    addLocation,
+  } = useContext(LocationContext);
 
-  const [err] = useLocation(isFocused, callBack)
+  const callBack = useCallback(
+    (location) => {
+      addLocation(location, recording);
+    },
+    [recording]
+  );
+
+  const [err] = useLocation(isFocused || recording, callBack);
   return (
     <SafeAreaView forceInset={{ top: 'always' }}>
       <Text h2> Create a Track</Text>
@@ -32,6 +39,11 @@ const TrackCreateScreen = ({ isFocused }) => {
       <TrackForm />
     </SafeAreaView>
   );
+};
+
+TrackCreateScreen.navigationOptions = {
+  title: 'Add Track',
+  tabBarIcon: <FontAwesome name='plus' size={20} />,
 };
 
 const styles = StyleSheet.create({});
